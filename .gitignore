@@ -1,0 +1,23 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# User input and output media
+input/*
+!input/.gitkeep
+output/*
+!output/.gitkeep
+
+# Temporary and OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log

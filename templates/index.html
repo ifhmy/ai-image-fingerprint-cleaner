@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مزيل بصمة الذكاء الاصطناعي من الصور والمجلدات | AI Image Cleaner</title>
+  <style>
+    :root {
+      --bg-main: #0f172a;
+      --bg-card: #1e293b;
+      --bg-card-hover: #263449;
+      --border: #334155;
+      --primary: #10b981;
+      --primary-hover: #059669;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --purple: #8b5cf6;
+      --purple-hover: #7c3aed;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 24px 16px 60px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand h1 {
+      font-size: 1.55rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand p {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      margin-top: 4px;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.18s ease;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: #052e16;
+    }
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+      color: #fff;
+    }
+
+    .btn-accent {
+      background-color: var(--accent);
+    }
+    .btn-accent:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .btn-purple {
+      background-color: var(--purple);
+    }
+    .btn-purple:hover {
+      background-color: var(--purple-hover);
+    }
+
+    .btn-outline {
+      background-color: var(--bg-card);
+      border-color: var(--border);
+      color: var(--text-main);
+    }
+    .btn-outline:hover {
+      background-color: var(--bg-card-hover);
+      border-color: var(--text-muted);
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .grid-layout {
+      display: grid;
+      grid-template-columns: 350px 1fr;
+      gap: 20px;
+      align-items: start;
+    }
+
+    @media (max-width: 950px) {
+      .grid-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .preset-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .preset-option {
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.55);
+      border-radius: 10px;
+      padding: 12px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .preset-option.active {
+      border-color: var(--primary);
+      background: rgba(16, 185, 129, 0.12);
+    }
+
+    .preset-option h4 {
+      font-size: 0.93rem;
+      margin-bottom: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .preset-option p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.86rem;
+      color: #cbd5e1;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .form-control, select {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-size: 0.9rem;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 0.86rem;
+      color: #e2e8f0;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+
+    .checkbox-row input {
+      width: 17px;
+      height: 17px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    /* Dropzone */
+    .dropzone {
+      border: 2px dashed #475569;
+      border-radius: 14px;
+      padding: 36px 20px;
+      text-align: center;
+      background: rgba(15, 23, 42, 0.45);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: 18px;
+    }
+
+    .dropzone:hover, .dropzone.dragover {
+      border-color: var(--primary);
+      background: rgba(16, 185, 129, 0.08);
+    }
+
+    .dropzone-icon {
+      font-size: 2.6rem;
+      margin-bottom: 8px;
+    }
+
+    .dropzone h3 {
+      font-size: 1.18rem;
+      margin-bottom: 6px;
+    }
+
+    .dropzone p {
+      font-size: 0.86rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .drop-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .action-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 700;
+    }
+
+    .badge-danger {
+      background: rgba(239, 68, 68, 0.18);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+
+    .badge-warning {
+      background: rgba(245, 158, 11, 0.18);
+      color: #fcd34d;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+
+    .badge-success {
+      background: rgba(16, 185, 129, 0.18);
+      color: #6ee7b7;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+
+    .badge-purple {
+      background: rgba(139, 92, 246, 0.18);
+      color: #c4b5fd;
+      border: 1px solid rgba(139, 92, 246, 0.4);
+    }
+
+    /* Folder Grouping Styles */
+    .folder-group {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 18px;
+      overflow: hidden;
+    }
+
+    .folder-header {
+      background: rgba(30, 41, 59, 0.85);
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .folder-header h3 {
+      font-size: 0.98rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #60a5fa;
+    }
+
+    .folder-items {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .result-item {
+      display: grid;
+      grid-template-columns: 100px 1fr auto;
+      gap: 14px;
+      align-items: center;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    @media (max-width: 640px) {
+      .result-item {
+        grid-template-columns: 1fr;
+        text-align: center;
+      }
+    }
+
+    .thumb-box {
+      width: 100px;
+      height: 100px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #090d16;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .thumb-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .item-details h4 {
+      font-size: 0.94rem;
+      margin-bottom: 4px;
+      word-break: break-all;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 6px;
+      align-items: center;
+    }
+
+    .findings-box {
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      background: rgba(30, 41, 59, 0.7);
+      padding: 7px 10px;
+      border-radius: 8px;
+      margin-top: 6px;
+    }
+
+    .status-banner {
+      display: none;
+      padding: 12px 16px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .status-banner.info {
+      display: block;
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      color: #93c5fd;
+    }
+
+    .status-banner.success {
+      display: block;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+      color: #6ee7b7;
+    }
+
+    .path-chip {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border);
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 0.76rem;
+      font-family: monospace;
+      color: #38bdf8;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <h1>🛡️ أداة إزالة بصمة الذكاء الاصطناعي وتنظيم المجلدات</h1>
+        <p>تنظيف شامل لبصمة AI ودعم المجلدات المتعددة وتصدير كل مجموعة داخل مجلد مستقل جديد</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-outline" onclick="openFolder('input')">📂 مجلد input</button>
+        <button class="btn btn-outline" onclick="openFolder('output')">📁 مجلد output</button>
+      </div>
+    </header>
+
+    <div class="grid-layout">
+      <!-- Right Sidebar: Settings -->
+      <div>
+        <div class="card">
+          <div class="card-title">
+            <span>⚙️ إعدادات المعالجة والتنظيف</span>
+          </div>
+
+          <div class="preset-group">
+            <div class="preset-option active" id="preset-rebuild" onclick="selectPreset('rebuild')">
+              <h4>
+                <span>✨ إعادة بناء صافية (موصى به)</span>
+                <span class="badge badge-success">الافتراضي</span>
+              </h4>
+              <p>إزالة جميع بيانات C2PA/EXIF/XMP بالكامل وإعادة بناء مصفوفة البكسل من الصفر.</p>
+            </div>
+
+            <div class="preset-option" id="preset-canva" onclick="selectPreset('canva')">
+              <h4>
+                <span>✂️ وضع محاكاة Canva الذكي</span>
+              </h4>
+              <p>تنظيف شامل + اقتصاص طفيف (1%) لتغيير البصمة المكانية للصورة تماماً مثل كانفا.</p>
+            </div>
+          </div>
+
+          <!-- Folder Organization Settings -->
+          <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 16px;">
+            <div style="font-size: 0.9rem; font-weight: 700; color: #60a5fa; margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
+              📁 تنظيم وتسمية المجلدات الجديدة
+            </div>
+
+            <div class="form-group">
+              <label>
+                <span>نظام توزيع الصور في المجلدات:</span>
+              </label>
+              <select id="folder_mode" class="form-control">
+                <option value="subfolder_clean" selected>مجلد جديد لكل فولدر فرعي (Folder1_clean)</option>
+                <option value="per_image">مجلد مستقل لكل صورة (Folder for each image)</option>
+                <option value="mirror">نفس اسم المجلد بدون لاحقة</option>
+              </select>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label>
+                <span>اللاحقة المضافة لاسم المجلد الجديد:</span>
+              </label>
+              <input type="text" id="folder_suffix" class="form-control" value="_clean" placeholder="مثال: _clean أو _نظيفة أو _جاهزة" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <span>صيغة التصدير (Output Format)</span>
+            </label>
+            <select id="output_format" class="form-control">
+              <option value="JPEG" selected>JPEG (الأفضل لفيسبوك والسوشيال ميديا)</option>
+              <option value="PNG">PNG (دقة عالية بدون ضغط)</option>
+              <option value="ORIGINAL">نفس صيغة الصورة الأصلية</option>
+              <option value="WEBP">WebP</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <span>نسبة الاقتصاص الطفيف (Micro-Crop)</span>
+              <span id="crop_val">0%</span>
+            </label>
+            <input type="range" id="crop_percent" min="0" max="4" step="0.5" value="0" oninput="document.getElementById('crop_val').innerText = this.value + '%'" />
+          </div>
+
+          <div class="form-group">
+            <label>
+              <span>جودة الصورة (Quality)</span>
+              <span id="qual_val">96%</span>
+            </label>
+            <input type="range" id="quality" min="80" max="100" step="1" value="96" oninput="document.getElementById('qual_val').innerText = this.value + '%'" />
+          </div>
+
+          <div class="form-group">
+            <label>
+              <span>هوية الصورة بعد التنظيف (EXIF)</span>
+            </label>
+            <select id="camera_profile" class="form-control">
+              <option value="none" selected>بدون أي بيانات (صورة صافية 100%)</option>
+              <option value="iphone">كاميرا iPhone 16 Pro</option>
+              <option value="samsung">كاميرا Samsung Galaxy S24 Ultra</option>
+              <option value="canon">كاميرا احترافية Canon EOS R5</option>
+            </select>
+          </div>
+
+          <label class="checkbox-row">
+            <input type="checkbox" id="pixel_shield" checked />
+            <span>إعادة بناء مصفوفة البكسل (كسر البصمة اللونية)</span>
+          </label>
+
+          <label class="checkbox-row">
+            <input type="checkbox" id="keep_dims" checked />
+            <span>الحفاظ على الطول والعرض الأصلي</span>
+          </label>
+
+          <label class="checkbox-row">
+            <input type="checkbox" id="auto_save" checked />
+            <span>حفظ تلقائي للصور داخل مجلد <code>output</code></span>
+          </label>
+        </div>
+
+        <!-- Direct Folder Batch Box -->
+        <div class="card">
+          <div class="card-title">
+            <span>⚡ معالجة مجلدات من الجهاز مباشرة</span>
+          </div>
+          <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 12px;">
+            ضع مجلداتك داخل مجلد input، أو اكتب مسار أي مجلد بجهازك يحتوي على مجلدات فرعية:
+          </p>
+
+          <div class="form-group">
+            <label><span>مسار مجلد الإدخال (Input Path):</span></label>
+            <input type="text" id="direct_input_path" class="form-control" value="{{ input_dir }}" />
+          </div>
+
+          <div id="folderScanSummary" style="display:none; font-size: 0.82rem; background: rgba(15,23,42,0.7); border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 12px;"></div>
+
+          <div style="display: flex; gap: 8px;">
+            <button class="btn btn-outline" style="flex: 1;" onclick="checkDirectFolder()">🔍 فحص المجلدات</button>
+            <button class="btn btn-accent" style="flex: 2;" onclick="processDirectFolder()">🚀 معالجة المجلد بالكامل</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Left Main Content: Dropzone & Results -->
+      <div>
+        <div class="card">
+          <!-- Hidden inputs for single files and whole folder structures -->
+          <input type="file" id="fileInput" multiple accept="image/*" style="display: none" onchange="handleStandardFiles(this.files)" />
+          <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none" onchange="handleDirectoryInput(this.files)" />
+
+          <div class="dropzone" id="dropzone">
+            <div class="dropzone-icon">📁</div>
+            <h3>اسحب وأفلت الفولدرات أو الصور هنا</h3>
+            <p>يمكنك سحب فولدر واحد أو 10 فولدرات معاً دفعة واحدة؛ سيتم فحصها وإنشاء مجلد مستقل لكل منها!</p>
+            <div class="drop-buttons">
+              <button type="button" class="btn btn-primary" onclick="event.stopPropagation(); document.getElementById('folderInput').click()">
+                📂 اختيار مجلد كامل (بجميع مجلداته الفرعية)
+              </button>
+              <button type="button" class="btn btn-outline" onclick="event.stopPropagation(); document.getElementById('fileInput').click()">
+                🖼️ اختيار صور منفصلة
+              </button>
+            </div>
+          </div>
+
+          <div id="statusBanner" class="status-banner"></div>
+
+          <div class="action-bar">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <button class="btn btn-primary" id="processBtn" onclick="processSelectedFiles()" disabled>
+                ⚡ تنظيف وتصدير العناصر المختارة (<span id="selectedCount">0</span>)
+              </button>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <a id="downloadZipBtn" class="btn btn-outline" style="display: none;" href="#">
+                📦 تحميل الكل بملف مضغوط (ZIP مع الحفاظ على الفولدرات)
+              </a>
+              <button class="btn btn-outline" onclick="clearList()">🗑️ مسح القائمة</button>
+            </div>
+          </div>
+
+          <div id="resultsContainer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedEntries = []; // Array of { file, relPath }
+
+    const dropzone = document.getElementById('dropzone');
+
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('dragover');
+    });
+
+    dropzone.addEventListener('drop', async (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+
+      showBanner('⏳ جاري قراءة الملفات والمجلدات المنسدلة...', 'info');
+      const items = e.dataTransfer.items;
+      if (items && items.length > 0) {
+        const extracted = await extractFilesFromDataTransfer(items);
+        if (extracted.length > 0) {
+          selectedEntries = extracted;
+          document.getElementById('selectedCount').innerText = selectedEntries.length;
+          document.getElementById('processBtn').disabled = false;
+          await processSelectedFiles();
+        } else {
+          showBanner('⚠️ لم يتم العثور على أي ملفات صور في العناصر المنسدلة.', 'info');
+        }
+      }
+    });
+
+    // Recursively extract all files with their relative subpaths from drag and drop
+    async function extractFilesFromDataTransfer(items) {
+      const results = [];
+      const queue = [];
+      const imageExts = ['.jpg', '.jpeg', '.png', '.webp', '.bmp'];
+
+      for (let i = 0; i < items.length; i++) {
+        const entry = items[i].webkitGetAsEntry ? items[i].webkitGetAsEntry() : null;
+        if (entry) queue.push(entry);
+      }
+
+      while (queue.length > 0) {
+        const entry = queue.shift();
+        if (entry.isFile) {
+          const file = await new Promise((res) => entry.file(res));
+          const lowerName = file.name.toLowerCase();
+          if (imageExts.some(ext => lowerName.endsWith(ext))) {
+            const rel = entry.fullPath.startsWith('/') ? entry.fullPath.slice(1) : entry.fullPath;
+            results.push({ file, relPath: rel });
+          }
+        } else if (entry.isDirectory) {
+          const reader = entry.createReader();
+          const subEntries = await readDirectoryAll(reader);
+          queue.push(...subEntries);
+        }
+      }
+      return results;
+    }
+
+    function readDirectoryAll(dirReader) {
+      return new Promise((resolve) => {
+        let entries = [];
+        const read = () => {
+          dirReader.readEntries((results) => {
+            if (!results.length) {
+              resolve(entries);
+            } else {
+              entries = entries.concat(Array.from(results));
+              read();
+            }
+          });
+        };
+        read();
+      });
+    }
+
+    function handleStandardFiles(fileList) {
+      const arr = Array.from(fileList);
+      selectedEntries = arr.map(f => ({ file: f, relPath: f.name }));
+      document.getElementById('selectedCount').innerText = selectedEntries.length;
+      document.getElementById('processBtn').disabled = false;
+      processSelectedFiles();
+    }
+
+    function handleDirectoryInput(fileList) {
+      const arr = Array.from(fileList);
+      const imageExts = ['.jpg', '.jpeg', '.png', '.webp', '.bmp'];
+      selectedEntries = arr
+        .filter(f => imageExts.some(ext => f.name.toLowerCase().endsWith(ext)))
+        .map(f => ({
+          file: f,
+          relPath: f.webkitRelativePath || f.name
+        }));
+
+      document.getElementById('selectedCount').innerText = selectedEntries.length;
+      document.getElementById('processBtn').disabled = selectedEntries.length === 0;
+      if (selectedEntries.length > 0) {
+        processSelectedFiles();
+      }
+    }
+
+    function selectPreset(mode) {
+      document.getElementById('preset-rebuild').classList.remove('active');
+      document.getElementById('preset-canva').classList.remove('active');
+
+      if (mode === 'rebuild') {
+        document.getElementById('preset-rebuild').classList.add('active');
+        document.getElementById('crop_percent').value = 0;
+        document.getElementById('crop_val').innerText = '0%';
+        document.getElementById('pixel_shield').checked = true;
+        document.getElementById('keep_dims').checked = true;
+      } else if (mode === 'canva') {
+        document.getElementById('preset-canva').classList.add('active');
+        document.getElementById('crop_percent').value = 1.0;
+        document.getElementById('crop_val').innerText = '1%';
+        document.getElementById('pixel_shield').checked = true;
+        document.getElementById('keep_dims').checked = true;
+      }
+    }
+
+    function showBanner(msg, type = 'info') {
+      const banner = document.getElementById('statusBanner');
+      banner.className = 'status-banner ' + type;
+      banner.innerText = msg;
+    }
+
+    async function processSelectedFiles() {
+      if (!selectedEntries.length) return;
+      const processBtn = document.getElementById('processBtn');
+      processBtn.disabled = true;
+
+      const totalEntries = selectedEntries.length;
+      const chunkSize = 15;
+      const totalChunks = Math.ceil(totalEntries / chunkSize);
+
+      let allItems = [];
+      let lastBatchId = null;
+
+      try {
+        for (let chunkIdx = 0; chunkIdx < totalChunks; chunkIdx++) {
+          const start = chunkIdx * chunkSize;
+          const end = Math.min(start + chunkSize, totalEntries);
+          const chunk = selectedEntries.slice(start, end);
+
+          showBanner(`⏳ جاري معالجة الدفعة ${chunkIdx + 1} من ${totalChunks} (الصور ${start + 1} إلى ${end} من إجمالي ${totalEntries})...`, 'info');
+
+          const formData = new FormData();
+          chunk.forEach(item => formData.append('images', item.file));
+
+          const relPaths = chunk.map(item => item.relPath);
+          formData.append('relative_paths', JSON.stringify(relPaths));
+
+          formData.append('crop_percent', document.getElementById('crop_percent').value);
+          formData.append('keep_original_dimensions', document.getElementById('keep_dims').checked);
+          formData.append('pixel_shield', document.getElementById('pixel_shield').checked);
+          formData.append('output_format', document.getElementById('output_format').value);
+          formData.append('quality', document.getElementById('quality').value);
+          formData.append('camera_profile', document.getElementById('camera_profile').value);
+          formData.append('auto_save', document.getElementById('auto_save').checked);
+          formData.append('folder_mode', document.getElementById('folder_mode').value);
+          formData.append('folder_suffix', document.getElementById('folder_suffix').value);
+
+          const res = await fetch('/api/process', {
+            method: 'POST',
+            body: formData
+          });
+
+          let data;
+          try {
+            data = await res.json();
+          } catch (e) {
+            const rawText = await res.text().catch(() => '');
+            throw new Error(`خطأ من الخادم (${res.status}): ${rawText.slice(0, 150) || 'استجابة غير صالحة'}`);
+          }
+
+          if (!data.success) {
+            showBanner('❌ ' + (data.error || 'حدث خطأ أثناء المعالجة'), 'info');
+            processBtn.disabled = false;
+            return;
+          }
+
+          lastBatchId = data.batch_id;
+          allItems = allItems.concat(data.items || []);
+
+          // Render progress incrementally
+          renderGroupedItems({
+            batch_id: lastBatchId,
+            items: allItems,
+            output_dir: data.output_dir
+          });
+        }
+
+        showBanner(`✅ تم تنظيف وتصدير جميع الصور بنجاح (${allItems.length} صورة) داخل مجلدات مستقلة في output!`, 'success');
+      } catch (err) {
+        showBanner('❌ حدث خطأ في الاتصال بالخادم المحلي: ' + err.message, 'info');
+      } finally {
+        processBtn.disabled = false;
+      }
+    }
+
+    async function checkDirectFolder() {
+      const inputPath = document.getElementById('direct_input_path').value.trim();
+      const summaryDiv = document.getElementById('folderScanSummary');
+      summaryDiv.style.display = 'block';
+      summaryDiv.innerHTML = '⏳ جاري الفحص...';
+
+      try {
+        const res = await fetch('/api/check-folder', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ input_path: inputPath })
+        });
+        let data;
+        try {
+          data = await res.json();
+        } catch (e) {
+          throw new Error(`خطأ خادم (${res.status})`);
+        }
+        if (!data.exists) {
+          summaryDiv.innerHTML = `<span style="color:#ef4444;">⚠️ المسار غير موجود: ${data.input_path}</span>`;
+          return;
+        }
+        const subCount = Object.keys(data.folder_counts).length;
+        let html = `<div><strong>📁 تم فحص المجلد:</strong> ${data.input_path}</div>`;
+        html += `<div><strong>📊 الإجمالي:</strong> ${data.total_images} صورة موزعة في ${subCount} مجلد فرعي:</div>`;
+        html += `<ul style="margin-top:6px; padding-right:18px;">`;
+        for (const [folder, count] of Object.entries(data.folder_counts)) {
+          html += `<li><code>${folder}</code>: ${count} صورة</li>`;
+        }
+        html += `</ul>`;
+        summaryDiv.innerHTML = html;
+      } catch (err) {
+        summaryDiv.innerHTML = `<span style="color:#ef4444;">خطأ: ${err.message}</span>`;
+      }
+    }
+
+    async function processDirectFolder() {
+      const inputPath = document.getElementById('direct_input_path').value.trim();
+      showBanner(`⏳ جاري معالجة جميع المجلدات والصور داخل: ${inputPath}...`, 'info');
+
+      try {
+        const res = await fetch('/api/process-folder', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            input_path: inputPath,
+            crop_percent: parseFloat(document.getElementById('crop_percent').value),
+            keep_original_dimensions: document.getElementById('keep_dims').checked,
+            pixel_shield: document.getElementById('pixel_shield').checked,
+            output_format: document.getElementById('output_format').value,
+            quality: parseInt(document.getElementById('quality').value, 10),
+            camera_profile: document.getElementById('camera_profile').value,
+            folder_mode: document.getElementById('folder_mode').value,
+            folder_suffix: document.getElementById('folder_suffix').value
+          })
+        });
+        let data;
+        try {
+          data = await res.json();
+        } catch (e) {
+          throw new Error(`خطأ خادم (${res.status})`);
+        }
+        if (!data.success) {
+          showBanner('⚠️ ' + data.error, 'info');
+          return;
+        }
+        renderGroupedItems(data);
+        showBanner(`✅ تمت معالجة وتوزيع ${data.items.length} صورة بنجاح في مجلدات جديدة داخل: ${data.output_dir}`, 'success');
+      } catch (err) {
+        showBanner('❌ خطأ: ' + err.message, 'info');
+      }
+    }
+
+    function renderGroupedItems(data) {
+      const container = document.getElementById('resultsContainer');
+      container.innerHTML = '';
+
+      const zipBtn = document.getElementById('downloadZipBtn');
+      if (data.batch_id && data.items.length > 0) {
+        zipBtn.style.display = 'inline-flex';
+        zipBtn.href = `/api/download-zip/${data.batch_id}`;
+      }
+
+      // Group items by parent folder
+      const groups = {};
+      data.items.forEach(item => {
+        const folder = item.parent_folder || 'المجلد الرئيسي';
+        if (!groups[folder]) groups[folder] = [];
+        groups[folder].push(item);
+      });
+
+      for (const [folderName, items] of Object.entries(groups)) {
+        const groupEl = document.createElement('div');
+        groupEl.className = 'folder-group';
+
+        const headerEl = document.createElement('div');
+        headerEl.className = 'folder-header';
+        headerEl.innerHTML = `
+          <h3>
+            <span>📁</span>
+            <span>المجلد الجديد: <strong>${folderName}</strong></span>
+          </h3>
+          <span class="badge badge-purple">${items.length} صورة</span>
+        `;
+        groupEl.appendChild(headerEl);
+
+        const itemsEl = document.createElement('div');
+        itemsEl.className = 'folder-items';
+
+        items.forEach(item => {
+          const before = item.report.before;
+          const after = item.report.after;
+
+          let beforeBadgeClass = 'badge-success';
+          if (before.status === 'AI_DETECTED') beforeBadgeClass = 'badge-danger';
+          else if (before.status === 'METADATA_FOUND') beforeBadgeClass = 'badge-warning';
+
+          let detectedHtml = '';
+          const aiReasons = before.ai_reasons || [];
+          const genMeta = before.general_metadata || [];
+
+          if (aiReasons.length > 0) {
+            detectedHtml += `
+              <div class="findings-box" style="border-right: 3px solid #ef4444; margin-bottom: 6px;">
+                <div style="color: #fca5a5; font-weight: 700; margin-bottom: 4px;">🚨 تم كشف بصمات ذكاء اصطناعي مكشوفة لفيسبوك:</div>
+                <ul style="padding-right: 20px; font-size: 0.82rem; margin: 0;">
+                  ${aiReasons.map(r => `<li>${r}</li>`).join('')}
+                </ul>
+              </div>
+            `;
+          }
+
+          if (genMeta.length > 0) {
+            detectedHtml += `
+              <div class="findings-box" style="border-right: 3px solid #f59e0b; margin-bottom: 6px;">
+                <div style="color: #fcd34d; font-weight: 600; margin-bottom: 4px;">🗑️ بيانات وصفية أخرى تم مسحها:</div>
+                <div style="font-size: 0.8rem; color: #cbd5e1;">${genMeta.join(' ، ')}</div>
+              </div>
+            `;
+          }
+
+          if (aiReasons.length === 0 && genMeta.length === 0) {
+            detectedHtml = `
+              <div class="findings-box" style="border-right: 3px solid #10b981;">
+                <span style="color: #6ee7b7; font-weight: 600;">✨ خالية من بصمات C2PA، وتمت إعادة بناء مصفوفة البكسل بالكامل لحماية الصورة.</span>
+              </div>
+            `;
+          }
+
+          const kbBefore = (before.size_bytes / 1024).toFixed(1);
+          const kbAfter = (item.report.output_size_bytes / 1024).toFixed(1);
+
+          const itemEl = document.createElement('div');
+          itemEl.className = 'result-item';
+          itemEl.innerHTML = `
+            <div class="thumb-box">
+              <img src="${item.preview_data_url}" alt="${item.output_name}" />
+            </div>
+            <div class="item-details">
+              <h4>${item.output_name}</h4>
+              <div class="meta-row">
+                <span class="badge ${beforeBadgeClass}">قبل: ${before.status_label}</span>
+                <span>⬅️</span>
+                <span class="badge badge-success">بعد: نظيفة 100% ✅</span>
+                <span class="path-chip">مسار الحفظ: ${item.output_rel}</span>
+              </div>
+              <div style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px;">
+                الأبعاد: ${item.report.output_width}×${item.report.output_height} | الصيغة: ${item.report.output_format} | الحجم: ${kbBefore} KB ⬅️ ${kbAfter} KB
+              </div>
+              ${detectedHtml}
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <a class="btn btn-primary" href="${item.preview_data_url}" download="${item.output_name}">
+                ⬇️ تحميل
+              </a>
+            </div>
+          `;
+          itemsEl.appendChild(itemEl);
+        });
+
+        groupEl.appendChild(itemsEl);
+        container.appendChild(groupEl);
+      }
+    }
+
+    function clearList() {
+      selectedEntries = [];
+      document.getElementById('selectedCount').innerText = '0';
+      document.getElementById('processBtn').disabled = true;
+      document.getElementById('resultsContainer').innerHTML = '';
+      document.getElementById('downloadZipBtn').style.display = 'none';
+      document.getElementById('statusBanner').style.display = 'none';
+      document.getElementById('fileInput').value = '';
+      document.getElementById('folderInput').value = '';
+    }
+
+    async function openFolder(which) {
+      await fetch('/api/open-folder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ folder: which })
+      });
+    }
+  </script>
+</body>
+</html>
