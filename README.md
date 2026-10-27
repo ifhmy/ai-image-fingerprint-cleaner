@@ -68,8 +68,8 @@ flowchart LR
 
 ### 1. استنساخ المشروع وتثبيت المتطلبات
 ```bash
-git clone https://github.com/USERNAME/REPO_NAME.git
-cd REPO_NAME
+git clone https://github.com/ifhmy/ai-image-fingerprint-cleaner.git
+cd ai-image-fingerprint-cleaner
 pip install -r requirements.txt
 ```
 
