@@ -1,138 +1,180 @@
-# 🛡️ AI Image Fingerprint Cleaner & Metadata Stripper
+# 🛡️ AI Image Fingerprint Cleaner
 
 <p align="center">
   <img src="https://img.shields.io/badge/Python-3.9%2B-blue?style=for-the-badge&logo=python&logoColor=white" alt="Python Version" />
   <img src="https://img.shields.io/badge/Flask-Web%20UI-green?style=for-the-badge&logo=flask&logoColor=white" alt="Flask" />
   <img src="https://img.shields.io/badge/Pillow-Image%20Processing-yellow?style=for-the-badge" alt="Pillow" />
   <img src="https://img.shields.io/badge/NumPy-Raw%20Array%20Decoupling-013243?style=for-the-badge&logo=numpy&logoColor=white" alt="NumPy" />
+  <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey?style=for-the-badge" alt="Platform" />
   <img src="https://img.shields.io/badge/License-MIT-purple?style=for-the-badge" alt="License" />
 </p>
 
 <p align="center">
-  <strong>أداة متقدمة لتنظيف وإزالة بصمات الذكاء الاصطناعي (C2PA / JUMBF / EXIF / XMP) وإعادة بناء الصور بالكامل لمنع تصنيفها على منصات التواصل الاجتماعي (Facebook, Instagram, TikTok).</strong>
-  <br />
-  <em>Advanced tool to completely purge AI watermarks, C2PA manifests, and provenance metadata from images, preventing automatic "Made with AI" labels on social media.</em>
+  <strong>An advanced, production-grade image sanitizer that completely strips C2PA Content Credentials, JUMBF containers, EXIF/XMP provenance metadata, and invisible watermarks from AI-generated images (ChatGPT / DALL-E 3, Midjourney, Stable Diffusion, Adobe Firefly) — preventing automated "Made with AI" labels on Facebook, Instagram, TikTok, and other platforms.</strong>
 </p>
 
 ---
 
-## 📌 المشكلة والحل (The Problem & Solution)
-
-### 🚨 لماذا يكتشف فيسبوك والسوشيال ميديا صور الذكاء الاصطناعي؟
-عند توليد أو تحسين الصور عبر **ChatGPT (DALL-E 3 / GPT-4o)** أو **Adobe Firefly** أو **Midjourney**، يتم تضمين بصمات رقمية متعددة المستويات:
-1. **بصمة C2PA و JUMBF المشفرة:** حاويات بيانات مدمجة داخل قطاعات `caBX` في ملفات PNG أو علامة `APP11` في JPEG أو `C2PA` في WebP.
-2. **وسم المصدر الرقمي IPTC / XMP:** وسم `trainedAlgorithmicMedia` أو `compositeWithTrainedAlgorithmicMedia` الذي تقرأه منصات Meta تلقائياً وتضع شارة **"Made with AI"**.
-3. **بيانات EXIF والبرنامج المنشئ:** وسوم واضحة باسم OpenAI أو برامج التصميم التوليدي.
-4. **بصمات التردد والبكسل الخفية (Invisible Pixel Watermarks):** علامات عالية التردد في مصفوفة البكسل.
-
-### 🛡️ كيف تحل هذه الأداة المشكلة؟
-* **إعادة البناء من الصفر (Zero Metadata Inheritance):** تفكيك الصورة بالكامل إلى مصفوفة بكسل خام (`Raw NumPy RGB Buffer`)، وتجاهل ملف الحاوية بالكامل؛ مما يضمن استحالة انتقال أي قطاع بيانات C2PA أو XMP أو وسم مخفي.
-* **محاكاة معالجة Canva الذكية (Canva-Style Shield):** تطبيق تعديل مجهري غير مرئي للبكسل (`LSB Micro-dither`) واقتصاص ذكي طفيف (1%) لكسر التوافق الترددي للبصمة المكانية.
-* **تصدير نظيف أو بهوية كاميرا حقيقية:** حفظ الصورة بترميز جديد نقي مع إمكانية حقن بيانات كاميرا حقيقية (مثل iPhone 16 Pro أو Canon EOS R5) لزيادة الموثوقية.
+## 📖 Table of Contents
+- [The Problem](#-the-problem)
+- [How It Works](#-how-it-works)
+- [Key Features](#-key-features)
+- [Architecture](#-architecture)
+- [Installation & Quickstart](#-installation--quickstart)
+- [Web UI Usage](#-web-ui-usage)
+- [Command-Line Interface (CLI)](#-command-line-interface-cli)
+- [Folder Organization Modes](#-folder-organization-modes)
+- [Project Structure](#-project-structure)
+- [Disclaimer & License](#-disclaimer--license)
 
 ---
 
-## ✨ المميزات الرئيسية (Key Features)
+## 🚨 The Problem
 
-* 🔍 **فاحص ومحلل البصمات المدمج (Built-in AI Fingerprint Inspector):** فحص دقيق قبل وبعد التنظيف لاكتشاف وتحديد وسوم `caBX`، `JUMBF`، `trainedAlgorithmicMedia`، وتوقيعات `OpenAI`.
-* 📁 **دعم المجلدات المتعددة والهيكل الشجري (Multi-Folder Batch Processing):** إذا كان لديك 20 مجلداً كل مجلد يحمل 10 صور، يقوم السكربت بمعالجتها جميعاً وتصدير كل مجموعة داخل مجلد مستقل جديد (مثل `Folder1_clean`، `Folder2_clean`).
-* ⚡ **نظام المعالجة على دفعات (Chunked Streaming Pipeline):** يعالج مئات الصور والملفات الضخمة بدون أي انهيار أو استهلاك مفرط للذاكرة.
-* 🖥️ **واجهة ويب عصرية وتفاعلية (Modern Web UI):** سحب وإفلات الفولدرات، معاينة حية قبل وبعد، ودعم تنزيل الكل بملف مضغوط `ZIP` يحتفظ بهيكل المجلدات.
-* 🚀 **معالجة سريعة بضغطة زر (Headless Batch):** ملف تشغيل فوري بدون فتح المتصفح (`quick_clean_folder.bat`).
-* 📸 **هوية كاميرا اختيارية (Camera EXIF Spoofing):**
-  * بدون أي بيانات (نقية 100%).
-  * Apple iPhone 16 Pro.
-  * Samsung Galaxy S24 Ultra.
-  * Canon EOS R5.
+When images are generated or enhanced using modern AI models (such as **ChatGPT / DALL-E 3 / GPT-4o**, **Adobe Firefly**, or **Midjourney**), cryptographic provenance data and digital signatures are embedded at multiple levels:
+
+1. **C2PA & JUMBF Provenance Manifests:** Embedded in `caBX` chunks (PNG), `APP11` markers (JPEG), or RIFF boxes (WebP).
+2. **IPTC & XMP Digital Source Tags:** Explicit tags like `iptcExt:DigitalSourceType = trainedAlgorithmicMedia` or `compositeWithTrainedAlgorithmicMedia`. Platforms like Meta (Facebook & Instagram) directly parse these to enforce the **"Made with AI" / "AI Info"** label.
+3. **EXIF Creator Tags:** Hardcoded metadata (`Software = OpenAI`, `Artist`, `ImageDescription`).
+4. **Spatial & High-Frequency Watermarks:** Invisible pixel-level frequency watermarks (such as SynthID, Tree-Ring, or DWT-DCT perturbations).
 
 ---
 
-## 🏗️ آلية العمل (Architecture Flow)
+## 💡 How It Works
+
+This tool defeats automated detection by completely severing the image from its container and restructuring its frequency fingerprint:
 
 ```mermaid
 flowchart LR
-    A["Original AI Image\n(ChatGPT / Midjourney)"] --> B["Binary Scanner\n(Detect C2PA / JUMBF / XMP)"]
-    B --> C["Raw Pixel Extraction\n(NumPy RGB Array)"]
-    C --> D["Pixel Shield\n(Micro-Dither & Phase Shift)"]
-    D --> E["Clean Re-Encode\n(JPEG / PNG / WebP)"]
-    E --> F["Zero-AI Clean File\n(100% Provenance-Free)"]
+    A["Raw AI Image\n(ChatGPT / Midjourney)"] --> B["Deep Binary Scanner\n(Detect C2PA, XMP, EXIF)"]
+    B --> C["Raw Pixel Extraction\n(Decouple into NumPy RGB)"]
+    C --> D["Pixel Shield Engine\n(Micro-Dither & Phase Shift)"]
+    D --> E["Clean Re-Encoding\n(Zero Metadata Inheritance)"]
+    E --> F["Clean Safe Image\n(Provenance-Free / Clean EXIF)"]
 ```
+
+1. **Zero Container Inheritance:** Unlike ordinary re-savers that preserve EXIF/chunk dictionaries, this tool unpacks the image into a raw numerical `NumPy` array in memory. All container chunks (`caBX`, `jumb`, `XMP`, `IPTC`, `iTXt`) are permanently discarded.
+2. **Canva-Style Pixel Shield:** Applies imperceptible sub-pixel phase shifting (`±0.4%` gamma/contrast normalization) and natural sensor micro-dithering (`PSNR > 48 dB`). This breaks spatial frequency watermarks and changes cryptographic file hashes without visible visual degradation.
+3. **Smart Micro-Crop (Optional):** Applies a sub-1% Canva-style micro-crop and Lanczos resample to disrupt spatial alignment matrices.
+4. **Camera EXIF Spoofing (Optional):** Injects authentic EXIF profiles (e.g., Apple iPhone 16 Pro, Canon EOS R5, Samsung Galaxy S24 Ultra) to make images appear as genuine hardware camera captures.
 
 ---
 
-## 🚀 التثبيت والتشغيل (Quickstart)
+## ✨ Key Features
 
-### المتطلبات (Prerequisites)
-* نظام تشغيل: Windows أو macOS أو Linux.
-* تثبيت Python 3.9 أو أحدث.
+- 🛡️ **Complete C2PA & Provenance Purge:** 100% elimination of C2PA manifests, JUMBF boxes, and XMP digital source types.
+- 🔍 **Real-Time Fingerprint Inspector:** Inspects and categorizes detected AI signatures (`caBX`, `JUMBF`, `trainedAlgorithmicMedia`, `OpenAI`, `DALL-E`) before and after processing.
+- 📁 **Recursive Multi-Folder Batch Engine:** Give it 20 folders with 10 images each; it automatically outputs 20 new folders (e.g., `Folder1_clean`, `Folder2_clean`), perfectly preserving subfolder organization.
+- ⚡ **Chunked Upload Pipeline:** Modern asynchronous batch streaming (15 images/chunk) handles gigabytes of images without browser memory exhaustion or request entity limits.
+- 🖥️ **Sleek Dark Web UI:** Drag-and-drop folders or files, real-time before/after status badges, individual downloads, and single-click full ZIP downloads.
+- 🚀 **Headless Batch Automation:** One-click script (`quick_clean_folder.bat`) for instant offline batch processing without opening a browser.
+- 📸 **Camera Hardware Profiles:** Optional simulation of authentic camera metadata (iPhone 16 Pro, Canon EOS R5, Samsung Galaxy S24 Ultra).
 
-### 1. استنساخ المشروع وتثبيت المتطلبات
+---
+
+## 🚀 Installation & Quickstart
+
+### Prerequisites
+- Python 3.9 or higher
+- Windows, macOS, or Linux
+
+### 1. Clone & Install Dependencies
 ```bash
 git clone https://github.com/ifhmy/ai-image-fingerprint-cleaner.git
 cd ai-image-fingerprint-cleaner
 pip install -r requirements.txt
 ```
 
-### 2. تشغيل الواجهة الرسومية (Web UI)
-* **على ويندوز:** اضغط مرتين على ملف **`run_app.bat`**
-* **أو عبر سطر الأوامر:**
+### 2. Launch the Web Interface
+- **On Windows:** Double-click [`run_app.bat`](run_app.bat)
+- **Or via Terminal:**
 ```bash
 python app.py
 ```
-ثم افتح المتصفح على الرابط: `http://127.0.0.1:5050`
+Open your browser at: **`http://127.0.0.1:5050`**
 
 ---
 
-## 💻 الاستخدام عبر سطر الأوامر (CLI Usage)
+## 🖥️ Web UI Usage
 
-يمكنك استخدام محرك التنظيف مباشرة من سطر الأوامر أو ضمن سكربتاتك البرمجية:
+1. **Drag & Drop:** Drop multiple images or entire folders directly into the dropzone.
+2. **Or Use Direct Folder Mode:**
+   - Put your folders inside the `input/` directory (or specify any folder path on your computer).
+   - Click **`🔍 Check Subfolders`** to see a live count of detected folders and images.
+   - Click **`🚀 Process Whole Directory`** to sanitize all images straight from disk.
+3. **Export & Download:**
+   - Cleaned images are automatically organized inside the `output/` directory.
+   - Click **`📦 Download All as ZIP`** to get an archive that preserves all subfolders.
+
+---
+
+## 💻 Command-Line Interface (CLI)
+
+Use the engine directly from the command line for automated scripts, headless servers, or pipelines:
 
 ```bash
-# تنظيف مجلد كامل مع الحفاظ على المجلدات الفرعية
-python cleaner_engine.py --input "path/to/input" --output "path/to/output" --folder-mode subfolder_clean --folder-suffix _clean
+# Clean an entire directory recursively preserving subfolders
+python cleaner_engine.py --input "input" --output "output" --folder-mode subfolder_clean --folder-suffix _clean
 
-# تنظيف مع اقتصاص ذكي 1% (محاكاة Canva) وجودة عالية 96%
-python cleaner_engine.py --input "image.png" --output "clean.jpg" --crop 1.0 --format JPEG --quality 96
+# Clean with 1.0% smart micro-crop (Canva emulation) and 96% JPEG quality
+python cleaner_engine.py --input "photo.png" --output "photo_clean.jpg" --crop 1.0 --quality 96
 
-# إضافة بيانات كاميرا iPhone 16 Pro
-python cleaner_engine.py --input "images_dir" --output "output_dir" --camera iphone
+# Clean and inject an authentic iPhone 16 Pro EXIF profile
+python cleaner_engine.py --input "ai_folder" --output "clean_folder" --camera iphone
 ```
 
-### خيارات سطر الأوامر (CLI Arguments):
-| المعامل | الوصف | الافتراضي |
-| :--- | :--- | :--- |
-| `--input` / `-i` | مسار ملف الصورة أو مجلد الإدخال | `input` |
-| `--output` / `-o` | مجلد حفظ الصور المعالجة | `output` |
-| `--crop` | نسبة الاقتصاص الطفيف (0.0 إلى 4.0%) | `0.0` |
-| `--format` | صيغة الإخراج (`JPEG`, `PNG`, `WEBP`, `ORIGINAL`) | `JPEG` |
-| `--quality` | جودة الصورة (60 إلى 100) | `96` |
-| `--camera` | بيانات الكاميرا (`none`, `iphone`, `samsung`, `canon`) | `none` |
-| `--folder-mode` | نظام المجلدات (`subfolder_clean`, `per_image`, `mirror`) | `subfolder_clean` |
-| `--folder-suffix` | اللاحقة المضافة لاسم المجلد الجديد | `_clean` |
+### CLI Arguments Reference
+
+| Flag | Description | Default | Choices |
+| :--- | :--- | :--- | :--- |
+| `--input`, `-i` | Path to input image file or directory | `input` | Any valid path |
+| `--output`, `-o` | Destination directory for sanitized images | `output` | Any valid path |
+| `--crop` | Smart micro-crop percentage | `0.0` | `0.0` to `4.0` |
+| `--format` | Output image format | `JPEG` | `JPEG`, `PNG`, `WEBP`, `ORIGINAL` |
+| `--quality` | Compression quality for JPEG/WebP | `96` | `60` to `100` |
+| `--camera` | Hardware camera EXIF profile to inject | `none` | `none`, `iphone`, `samsung`, `canon` |
+| `--folder-mode` | Output folder distribution strategy | `subfolder_clean` | `subfolder_clean`, `per_image`, `mirror` |
+| `--folder-suffix`| Suffix appended to created output folders | `_clean` | String (e.g. `_clean`, `_ready`) |
 
 ---
 
-## 📂 هيكل المشروع (Project Structure)
+## 📂 Folder Organization Modes
+
+When processing multiple folders:
+
+- **`subfolder_clean` (Default):** Creates a matching cleaned folder for each subfolder.
+  - `input/Cars/ferrari.png` ➔ `output/Cars_clean/ferrari_clean.jpg`
+  - `input/Nature/lake.png` ➔ `output/Nature_clean/lake_clean.jpg`
+- **`per_image`:** Places each individual image inside its own dedicated folder.
+  - `input/Cars/ferrari.png` ➔ `output/Cars_clean/ferrari_clean/ferrari_clean.jpg`
+- **`mirror`:** Maintains the exact original folder names without any suffix.
+  - `input/Cars/ferrari.png` ➔ `output/Cars/ferrari_clean.jpg`
+
+---
+
+## 📁 Project Structure
 
 ```text
-├── app.py                   # تطبيق الويب المحلي (Flask Web Server)
-├── cleaner_engine.py        # المحرك الأساسي لإزالة البيانات وإعادة بناء البكسل
-├── requirements.txt         # المكتبات المطلوبة (Flask, Pillow, numpy)
-├── run_app.bat              # تشغيل الواجهة الرسومية بضغطة زر على ويندوز
-├── quick_clean_folder.bat   # تنظيف سريع ومباشر لمجلد input بضغطة زر
+ai-image-fingerprint-cleaner/
+├── app.py                   # Flask Web Server & API endpoints
+├── cleaner_engine.py        # Core image sanitizer, C2PA scanner & pixel engine
+├── requirements.txt         # Production dependencies (Flask, Pillow, numpy)
+├── run_app.bat              # One-click Windows Web UI launcher
+├── quick_clean_folder.bat   # One-click Windows offline batch script
 ├── templates/
-│   └── index.html           # واجهة الويب التفاعلية (HTML5 / Modern Dark RTL UI)
-├── input/                   # مجلد الإدخال للصور والمجلدات
-└── output/                  # مجلد الإخراج للنتائج النظيفة
+│   └── index.html           # Modern dark-mode responsive web interface
+├── input/                   # Default input directory for files & subfolders
+└── output/                  # Default destination for sanitized files & folders
 ```
 
 ---
 
-## ⚖️ إخلاء مسؤولية (Disclaimer)
+## ⚖️ Disclaimer
 
-هذه الأداة مصممة لأغراض حماية الخصوصية، وإدارة البيانات الوصفية للمصممين وصناع المحتوى، والتحكم في بيانات الصور الشخصية. يرجى استخدامها وفقاً لسياسات المنصات والقوانين المعمول بها.
+This software is developed for privacy preservation, metadata management, and educational analysis of digital provenance standards. Users are responsible for complying with the terms of service and acceptable use policies of their respective publishing platforms.
 
 ---
 
-## 📄 الترخيص (License)
-هذا المشروع مرخص تحت رخصة **[MIT](LICENSE)**.
+## 📄 License
+
+This project is licensed under the **[MIT License](LICENSE)**.
